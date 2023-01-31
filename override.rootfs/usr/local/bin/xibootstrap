@@ -1,0 +1,76 @@
+#!/bin/sh
+
+set -e
+
+disk="$1"
+admin="$2"
+
+if [ -z "$disk" ]; then
+  echo no disk specified
+  exit 1
+fi
+
+if [ -z "$admin" ]; then
+  echo no admin specified
+  exit 1
+fi
+
+sgdisk -Z "$disk" \
+  -n 1::+300MiB -c 1:efi -t 1:ef00 \
+  -n 2:: -c 2:root -t 2:8304
+
+# udevadm wait /dev/disk/by-partlabel/efi /dev/disk/by-partlabel/root
+
+while ! udevadm info /dev/disk/by-partlabel/efi > /dev/null 2>&1 \
+  && ! udevadm info /dev/disk/by-partlabel/root > /dev/null 2>&1; do
+  sleep .1
+done
+
+{
+  mkfs.ext4 -Fq /dev/disk/by-partlabel/root
+  mount /dev/disk/by-partlabel/root /mnt
+} &
+
+mkfs.fat -F 32 /dev/disk/by-partlabel/efi &
+wait
+mkdir -p /mnt/boot/efi
+mount /dev/disk/by-partlabel/efi /mnt/boot/efi
+
+{
+  cp -Tax / /mnt
+  cp -Ta /usr/local/share/xi/override.rootfs /mnt
+} &
+
+cp -RT /usr/local/share/xi/override.efi /mnt/boot/efi &
+wait
+cp --preserve=all /mnt/initrd.img /mnt/vmlinuz /mnt/boot/efi &
+
+(
+  chroot /mnt /usr/sbin/usermod -d /home/"$admin" -l "$admin" xi
+
+  {
+    mkdir -m 750 /mnt/home/"$admin"
+    chroot /mnt /usr/bin/chown "$admin":"$admin" /home/"$admin"
+  } &
+
+  echo "$admin":"$admin" | chroot /mnt /usr/sbin/chpasswd &
+  wait
+) &
+
+chroot /mnt /usr/sbin/groupmod -n "$admin" xi &
+rm -rf /mnt/etc/sddm.conf.d/autologin.conf /mnt/etc/sudoers.d/xi /mnt/home/xi /mnt/usr/local/bin/xibootstrap &
+
+(
+  mount -B /dev /mnt/dev &
+
+  {
+    mount -B /sys /mnt/sys
+    mount -B /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
+  } &
+
+  wait
+  chroot /mnt /usr/bin/bootctl install
+) &
+
+wait
+umount -R /mnt
