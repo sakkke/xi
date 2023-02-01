@@ -50,7 +50,8 @@ cp --preserve=all /mnt/initrd.img /mnt/vmlinuz /mnt/boot/efi &
 
   {
     mkdir -m 750 /mnt/home/"$admin"
-    chroot /mnt /usr/bin/chown "$admin":"$admin" /home/"$admin"
+    cp -RT /mnt/etc/skel /mnt/home/"$admin"
+    chroot /mnt /usr/bin/chown -R "$admin":"$admin" /home/"$admin"
   } &
 
   echo "$admin":"$admin" | chroot /mnt /usr/sbin/chpasswd &
