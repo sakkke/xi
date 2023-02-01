@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -e
 
 cp xi.iso user.iso
 rm -f user.qcow2
