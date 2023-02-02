@@ -2,6 +2,10 @@
 
 set -e
 
+if [ "$(id -u)" -ne 0 ]; then
+  exec sudo "$0"
+fi
+
 setup_rootfs() {
   rm -rf rootfs
   debootstrap bullseye rootfs

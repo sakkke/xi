@@ -6,7 +6,7 @@
 
 ```sh
 xargs -a xiiso.devdeps apt install -y
-sudo ./build.sh
+./build.sh
 ```
 
 ### Run
