@@ -2,6 +2,10 @@
 
 set -e
 
+if [ "$(id -u)" -ne 0 ]; then
+  exec sudo "$0" "$@"
+fi
+
 disk="$1"
 admin="$2"
 
