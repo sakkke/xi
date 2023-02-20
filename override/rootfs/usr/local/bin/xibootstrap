@@ -25,6 +25,8 @@ main() {
 
   shift
 
+  argn="$#"
+
   if [ "$target" = dir ]; then
     xi_dir "$@"
     return
@@ -115,12 +117,12 @@ xi_dir() {
     exec sudo "$0" -t dir "$@"
   fi
 
-  dir="$1"
-
-  if [ -z "$dir" ]; then
-    echo no directory specified
+  if [ "$argn" -lt 1 ]; then
+    echo missing argument
     return 1
   fi
+
+  dir="$1"
 
   setup_dir
   setup_rootfs
@@ -136,18 +138,13 @@ xi_disk() {
     exec sudo "$0" "$@"
   fi
 
+  if [ "$argn" -lt 2 ]; then
+    echo missing argument
+    return 1
+  fi
+
   disk="$1"
   admin="$2"
-
-  if [ -z "$disk" ]; then
-    echo no disk specified
-    return 1
-  fi
-
-  if [ -z "$admin" ]; then
-    echo no admin specified
-    return 1
-  fi
 
   sgdisk -Z "$disk" \
     -n 1::+300MiB -c 1:efi -t 1:ef00 \
