@@ -42,10 +42,10 @@ mount /dev/disk/by-partlabel/efi /mnt/boot/efi
 
 {
   cp -Tax / /mnt
-  cp -Ta /usr/local/share/xi/override.rootfs /mnt
+  cp -Ta /usr/local/share/xi/override/rootfs /mnt
 } &
 
-cp -RT /usr/local/share/xi/override.efi /mnt/boot/efi &
+cp -RT /usr/local/share/xi/override/efi /mnt/boot/efi &
 wait
 cp --preserve=all /mnt/initrd.img /mnt/vmlinuz /mnt/boot/efi &
 

@@ -18,7 +18,7 @@ setup_rootfs() {
   xargs -a ../packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
-  cp -RT ../override.rootfs rootfs
+  cp -RT ../override/rootfs rootfs
   chroot rootfs /usr/sbin/useradd -mG sudo -s /bin/bash xi
   echo xi:xi | chroot rootfs /usr/sbin/chpasswd
   chroot rootfs /usr/bin/systemctl enable systemd-networkd.service
@@ -40,7 +40,7 @@ setup_efi() {
   rm -rf efi
   mkdir efi
   mount efi.img efi
-  cp -RT ../override.efi efi
+  cp -RT ../override/efi efi
   mkdir -p efi/EFI/BOOT efi/EFI/systemd
   cp rootfs/initrd.img rootfs/vmlinuz efi
   cp rootfs/usr/lib/systemd/boot/efi/systemd-bootx64.efi efi/EFI/BOOT/BOOTX64.EFI
