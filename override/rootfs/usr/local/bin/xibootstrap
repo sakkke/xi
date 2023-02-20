@@ -2,6 +2,31 @@
 
 set -e
 
+show_help() {
+  cat << '/cat'
+Usage:
+  xibootstrap DISK ADMIN
+
+Options:
+  --help  show help
+/cat
+}
+
+eval set -- $(getopt -l help -- "$@")
+
+while [ "$1" != -- ]; do
+  case "$1" in
+    --help )
+      show_help
+      exit
+      ;;
+  esac
+
+  shift
+done
+
+shift
+
 if [ "$(id -u)" -ne 0 ]; then
   exec sudo "$0" "$@"
 fi
