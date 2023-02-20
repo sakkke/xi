@@ -2,16 +2,24 @@
 
 set -e
 
+cwd="$(cd "$(dirname "$0")" && pwd)"
+
+src=host
 target=disk
 
 main() {
-  eval set -- $(getopt -o t: -l help,target: -- "$@")
+  eval set -- $(getopt -o s:t: -l help,source:,target: -- "$@")
 
   while [ "$1" != -- ]; do
     case "$1" in
       --help )
         show_help
         return
+        ;;
+
+      --source | -s )
+        src="$2"
+        shift
         ;;
 
       --target | -t )
@@ -27,17 +35,17 @@ main() {
 
   argn="$#"
 
-  if [ "$target" = dir ]; then
-    xi_dir "$@"
+  if [ "$src" = cwd ] && [ "$target" = dir ]; then
+    xi_cwd_dir "$@"
     return
   fi
 
-  if [ "$target" = disk ]; then
-    xi_disk "$@"
+  if [ "$src" = host ] && [ "$target" = disk ]; then
+    xi_host_disk "$@"
     return
   fi
 
-  echo invalid target
+  echo invalid source or target
   return 1
 }
 
@@ -50,10 +58,10 @@ setup_rootfs() {
   rm -rf rootfs
   mkdir -p archives
   debootstrap --cache-dir="$PWD"/archives bullseye rootfs
-  xargs -a ../packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
+  xargs -a "$cwd"/packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
-  cp -RT ../override/rootfs rootfs
+  cp -RT "$cwd"/override/rootfs rootfs
   chroot rootfs /usr/sbin/useradd -mG sudo -s /bin/bash xi
   echo xi:xi | chroot rootfs /usr/sbin/chpasswd
   chroot rootfs /usr/bin/systemctl enable systemd-networkd.service
@@ -75,7 +83,7 @@ setup_efi() {
   rm -rf efi
   mkdir efi
   mount efi.img efi
-  cp -RT ../override/efi efi
+  cp -RT "$cwd"/override/efi efi
   mkdir -p efi/EFI/BOOT efi/EFI/systemd
   cp rootfs/initrd.img rootfs/vmlinuz efi
   cp rootfs/usr/lib/systemd/boot/efi/systemd-bootx64.efi efi/EFI/BOOT/BOOTX64.EFI
@@ -103,8 +111,13 @@ Usage:
   xibootstrap -t dir DIRECTORY
 
 Options:
+  -s, --source  select SOURCE
   -t, --target  select TARGET
   --help  show help
+
+Sources:
+  cwd  source from CWD
+  host  source from host system
 
 Targets:
   dir  install xi to DIRECTORY
@@ -112,9 +125,9 @@ Targets:
 /cat
 }
 
-xi_dir() {
+xi_cwd_dir() {
   if [ "$(id -u)" -ne 0 ]; then
-    exec sudo "$0" -t dir "$@"
+    exec sudo "$0" -s cwd -t dir "$@"
   fi
 
   if [ "$argn" -lt 1 ]; then
@@ -133,7 +146,7 @@ xi_dir() {
   setup_iso
 }
 
-xi_disk() {
+xi_host_disk() {
   if [ "$(id -u)" -ne 0 ]; then
     exec sudo "$0" "$@"
   fi
