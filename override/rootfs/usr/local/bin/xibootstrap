@@ -5,10 +5,11 @@ set -e
 cwd="$(cd "$(dirname "$0")" && pwd)"
 
 src=host
+suite=bullseye
 target=disk
 
 main() {
-  eval set -- $(getopt -o s:t: -l help,source:,target: -- "$@")
+  eval set -- $(getopt -o s:t: -l help,source:,suite:,target: -- "$@")
 
   while [ "$1" != -- ]; do
     case "$1" in
@@ -19,6 +20,11 @@ main() {
 
       --source | -s )
         src="$2"
+        shift
+        ;;
+
+      --suite )
+        suite="$2"
         shift
         ;;
 
@@ -57,7 +63,7 @@ setup_dir() {
 setup_rootfs() {
   rm -rf rootfs
   mkdir -p archives
-  debootstrap --cache-dir="$PWD"/archives bullseye rootfs
+  debootstrap --cache-dir="$PWD"/archives "$suite" rootfs
   xargs -a "$cwd"/packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
@@ -112,6 +118,7 @@ Usage:
 
 Options:
   -s, --source  select SOURCE
+  --suite  select SUITE
   -t, --target  select TARGET
   --help  show help
 
