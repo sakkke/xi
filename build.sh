@@ -8,7 +8,8 @@ fi
 
 setup_rootfs() {
   rm -rf rootfs
-  debootstrap bullseye rootfs
+  mkdir -p archives
+  debootstrap --cache-dir="$PWD"/archives bullseye rootfs
   xargs -a packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
