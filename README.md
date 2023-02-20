@@ -23,8 +23,7 @@ xibootstrap DISK ADMIN
 ### Build
 
 ```sh
-sudo xargs -a xiiso.devdeps apt install -y
-make
+make bootstrap build
 ```
 
 ### Run
