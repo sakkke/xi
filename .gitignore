@@ -1,9 +1,3 @@
-/archives
-/efi.img
-/filesystem.squashfs
-/iso
-/live
-/rootfs
+/build
 /user.iso
 /user.qcow2
-/xi.iso
