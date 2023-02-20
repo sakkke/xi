@@ -23,7 +23,7 @@ xibootstrap DISK ADMIN
 ### Build
 
 ```sh
-make bootstrap build
+sudo make bootstrap build
 ```
 
 ### Run
