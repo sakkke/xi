@@ -24,7 +24,7 @@ xibootstrap DISK ADMIN
 
 ```sh
 sudo xargs -a xiiso.devdeps apt install -y
-./build.sh
+./xibootstrap -t dir build
 ```
 
 ### Run
