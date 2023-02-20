@@ -1,5 +1,6 @@
 debian-archive-keyring
 debootstrap
+make
 qemu-system-x86
 squashfs-tools
 xorriso
