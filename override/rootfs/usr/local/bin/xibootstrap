@@ -2,6 +2,25 @@
 
 set -e
 
+main() {
+  eval set -- $(getopt -l help -- "$@")
+
+  while [ "$1" != -- ]; do
+    case "$1" in
+      --help )
+        show_help
+        return
+        ;;
+    esac
+
+    shift
+  done
+
+  shift
+
+  xi_disk "$@"
+}
+
 show_help() {
   cat << '/cat'
 Usage:
@@ -12,95 +31,84 @@ Options:
 /cat
 }
 
-eval set -- $(getopt -l help -- "$@")
+xi_disk() {
+  if [ "$(id -u)" -ne 0 ]; then
+    exec sudo "$0" "$@"
+  fi
 
-while [ "$1" != -- ]; do
-  case "$1" in
-    --help )
-      show_help
-      exit
-      ;;
-  esac
+  disk="$1"
+  admin="$2"
 
-  shift
-done
+  if [ -z "$disk" ]; then
+    echo no disk specified
+    return 1
+  fi
 
-shift
+  if [ -z "$admin" ]; then
+    echo no admin specified
+    return 1
+  fi
 
-if [ "$(id -u)" -ne 0 ]; then
-  exec sudo "$0" "$@"
-fi
+  sgdisk -Z "$disk" \
+    -n 1::+300MiB -c 1:efi -t 1:ef00 \
+    -n 2:: -c 2:root -t 2:8304
 
-disk="$1"
-admin="$2"
+  # udevadm wait /dev/disk/by-partlabel/efi /dev/disk/by-partlabel/root
 
-if [ -z "$disk" ]; then
-  echo no disk specified
-  exit 1
-fi
-
-if [ -z "$admin" ]; then
-  echo no admin specified
-  exit 1
-fi
-
-sgdisk -Z "$disk" \
-  -n 1::+300MiB -c 1:efi -t 1:ef00 \
-  -n 2:: -c 2:root -t 2:8304
-
-# udevadm wait /dev/disk/by-partlabel/efi /dev/disk/by-partlabel/root
-
-while ! udevadm info /dev/disk/by-partlabel/efi > /dev/null 2>&1 \
-  && ! udevadm info /dev/disk/by-partlabel/root > /dev/null 2>&1; do
-  sleep .1
-done
-
-{
-  mkfs.ext4 -Fq /dev/disk/by-partlabel/root
-  mount /dev/disk/by-partlabel/root /mnt
-} &
-
-mkfs.fat -F 32 /dev/disk/by-partlabel/efi &
-wait
-mkdir -p /mnt/boot/efi
-mount /dev/disk/by-partlabel/efi /mnt/boot/efi
-
-{
-  cp -Tax / /mnt
-  cp -Ta /usr/local/share/xi/override/rootfs /mnt
-} &
-
-cp -RT /usr/local/share/xi/override/efi /mnt/boot/efi &
-wait
-cp --preserve=all /mnt/initrd.img /mnt/vmlinuz /mnt/boot/efi &
-
-(
-  chroot /mnt /usr/sbin/usermod -d /home/"$admin" -l "$admin" xi
+  while ! udevadm info /dev/disk/by-partlabel/efi > /dev/null 2>&1 \
+    && ! udevadm info /dev/disk/by-partlabel/root > /dev/null 2>&1; do
+    sleep .1
+  done
 
   {
-    mkdir -m 750 /mnt/home/"$admin"
-    cp -RT /mnt/etc/skel /mnt/home/"$admin"
-    chroot /mnt /usr/bin/chown -R "$admin":"$admin" /home/"$admin"
+    mkfs.ext4 -Fq /dev/disk/by-partlabel/root
+    mount /dev/disk/by-partlabel/root /mnt
   } &
 
-  echo "$admin":"$admin" | chroot /mnt /usr/sbin/chpasswd &
+  mkfs.fat -F 32 /dev/disk/by-partlabel/efi &
   wait
-) &
-
-chroot /mnt /usr/sbin/groupmod -n "$admin" xi &
-rm -rf /mnt/etc/sddm.conf.d/autologin.conf /mnt/etc/sudoers.d/xi /mnt/home/xi /mnt/usr/local/bin/xibootstrap &
-
-(
-  mount -B /dev /mnt/dev &
+  mkdir -p /mnt/boot/efi
+  mount /dev/disk/by-partlabel/efi /mnt/boot/efi
 
   {
-    mount -B /sys /mnt/sys
-    mount -B /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
+    cp -Tax / /mnt
+    cp -Ta /usr/local/share/xi/override/rootfs /mnt
   } &
 
+  cp -RT /usr/local/share/xi/override/efi /mnt/boot/efi &
   wait
-  chroot /mnt /usr/bin/bootctl install
-) &
+  cp --preserve=all /mnt/initrd.img /mnt/vmlinuz /mnt/boot/efi &
 
-wait
-umount -R /mnt
+  (
+    chroot /mnt /usr/sbin/usermod -d /home/"$admin" -l "$admin" xi
+
+    {
+      mkdir -m 750 /mnt/home/"$admin"
+      cp -RT /mnt/etc/skel /mnt/home/"$admin"
+      chroot /mnt /usr/bin/chown -R "$admin":"$admin" /home/"$admin"
+    } &
+
+    echo "$admin":"$admin" | chroot /mnt /usr/sbin/chpasswd &
+    wait
+  ) &
+
+  chroot /mnt /usr/sbin/groupmod -n "$admin" xi &
+  rm -rf /mnt/etc/sddm.conf.d/autologin.conf /mnt/etc/sudoers.d/xi /mnt/home/xi /mnt/usr/local/bin/xibootstrap &
+
+  (
+    mount -B /dev /mnt/dev &
+
+    {
+      mount -B /sys /mnt/sys
+      mount -B /sys/firmware/efi/efivars /mnt/sys/firmware/efi/efivars
+    } &
+
+    wait
+    chroot /mnt /usr/bin/bootctl install
+  ) &
+
+  wait
+  umount -R /mnt
+}
+
+main "$@"

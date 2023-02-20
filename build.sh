@@ -2,9 +2,19 @@
 
 set -e
 
-if [ "$(id -u)" -ne 0 ]; then
-  exec sudo "$0"
-fi
+main() {
+  if [ "$(id -u)" -ne 0 ]; then
+    exec sudo "$0"
+  fi
+
+  setup_build
+  setup_rootfs
+  setup_filesystem_squashfs
+  setup_efi_img
+  setup_efi
+  setup_live
+  setup_iso
+}
 
 setup_build() {
   mkdir -p build
@@ -61,10 +71,4 @@ setup_iso() {
   xorriso -as mkisofs -append_partition 2 0xef efi.img -o xi.iso iso
 }
 
-setup_build
-setup_rootfs
-setup_filesystem_squashfs
-setup_efi_img
-setup_efi
-setup_live
-setup_iso
+main "$@"
