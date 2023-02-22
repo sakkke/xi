@@ -1,2 +1,9 @@
-PARTLABEL=root / ext4 rw 0 1
+PARTLABEL=root / btrfs rw,subvol=@xi 0 1
+PARTLABEL=root /boot btrfs rw,subvol=@xi_boot 0 1
+PARTLABEL=root /home btrfs rw,subvol=@xi_home 0 1
+PARTLABEL=root /home/data btrfs rw,subvol=@data 0 1
+PARTLABEL=root /home/snapshots btrfs rw,subvol=@snapshots 0 1
+PARTLABEL=root /opt btrfs rw,subvol=@xi_opt 0 1
+PARTLABEL=root /root btrfs rw,subvol=@xi_root 0 1
+PARTLABEL=root /var btrfs rw,subvol=@xi_var 0 1
 PARTLABEL=efi /boot/efi vfat rw

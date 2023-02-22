@@ -177,14 +177,72 @@ xi_host_disk() {
     sleep .1
   done
 
-  {
-    mkfs.ext4 -Fq /dev/disk/by-partlabel/root
+  (
+    mkfs.btrfs -f /dev/disk/by-partlabel/root
     mount /dev/disk/by-partlabel/root /mnt
-  } &
+    btrfs subvolume create /mnt/@xi &
+    btrfs subvolume create /mnt/@xi_boot &
+    btrfs subvolume create /mnt/@xi_home &
+    btrfs subvolume create /mnt/@xi_opt &
+    btrfs subvolume create /mnt/@xi_root &
+    btrfs subvolume create /mnt/@xi_var &
+    btrfs subvolume create /mnt/@data &
+    btrfs subvolume create /mnt/@snapshots &
+    wait
+    umount /mnt
+    mount -o subvol=@xi /dev/disk/by-partlabel/root /mnt
+
+    {
+      mkdir /mnt/boot
+      mount -o subvol=@xi_boot /dev/disk/by-partlabel/root /mnt/boot
+    } &
+
+    (
+      mkdir /mnt/home
+      mount -o subvol=@xi_home /dev/disk/by-partlabel/root /mnt/home
+
+      {
+        mkdir /mnt/home/data
+        mount -o subvol=@data /dev/disk/by-partlabel/root /mnt/home/data
+        chown 65534:65534 /mnt/home/data &
+        chmod 2777 /mnt/home/data &
+        wait
+      } &
+
+      {
+        mkdir /mnt/home/snapshots
+        mount -o subvol=@snapshots /dev/disk/by-partlabel/root /mnt/home/snapshots
+      } &
+
+      wait
+    ) &
+
+    {
+      mkdir /mnt/opt
+      mount -o subvol=@xi_opt /dev/disk/by-partlabel/root /mnt/opt
+    } &
+
+    {
+      mkdir /mnt/root
+      mount -o subvol=@xi_root /dev/disk/by-partlabel/root /mnt/root
+    } &
+
+    {
+      mkdir /mnt/var
+      mount -o subvol=@xi_var /dev/disk/by-partlabel/root /mnt/var
+    } &
+
+    {
+      mkdir /mnt/data
+      mount -o subvol=@data /dev/disk/by-partlabel/root /mnt/data
+    } &
+
+    wait
+  ) &
 
   mkfs.fat -F 32 /dev/disk/by-partlabel/efi &
   wait
-  mkdir -p /mnt/boot/efi
+  mkdir /mnt/boot/efi
   mount /dev/disk/by-partlabel/efi /mnt/boot/efi
 
   {
