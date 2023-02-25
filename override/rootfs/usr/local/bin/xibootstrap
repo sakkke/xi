@@ -9,10 +9,14 @@ suite=bullseye
 target=disk
 
 main() {
-  eval set -- $(getopt -o s:t: -l help,source:,suite:,target: -- "$@")
+  eval set -- $(getopt -o s:t: -l debug,help,source:,suite:,target: -- "$@")
 
   while [ "$1" != -- ]; do
     case "$1" in
+      --debug )
+        debug=1
+        ;;
+
       --help )
         show_help
         return
@@ -38,6 +42,10 @@ main() {
   done
 
   shift
+
+  if [ -n "$debug" ]; then
+    set -x
+  fi
 
   argn="$#"
 
@@ -117,6 +125,7 @@ Usage:
   xibootstrap -t dir DIRECTORY
 
 Options:
+  --debug  enable debug mode
   -s, --source  select SOURCE
   --suite  select SUITE
   -t, --target  select TARGET
