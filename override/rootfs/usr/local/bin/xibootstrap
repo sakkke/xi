@@ -64,11 +64,19 @@ main() {
 }
 
 setup_dir() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   mkdir -p "$dir"
   cd "$dir"
 }
 
 setup_rootfs() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   rm -rf rootfs
   mkdir -p archives
 
@@ -91,17 +99,29 @@ setup_rootfs() {
 }
 
 setup_filesystem_squashfs() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   rm -f filesystem.squashfs
   mksquashfs rootfs filesystem.squashfs -comp zstd
 }
 
 setup_efi_img() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   rm -f efi.img
   truncate -s 300M efi.img
   mkfs.fat -F 32 efi.img
 }
 
 setup_efi() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   rm -rf efi
   mkdir efi
   mount efi.img efi
@@ -114,12 +134,20 @@ setup_efi() {
 }
 
 setup_live() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   rm -rf live
   mkdir live
   cp filesystem.squashfs live
 }
 
 setup_iso() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   rm -rf iso
   mkdir iso
   cp -R live iso
@@ -127,6 +155,10 @@ setup_iso() {
 }
 
 show_help() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   cat << '/cat'
 Usage:
   xibootstrap [-t disk] DISK ADMIN
@@ -150,6 +182,10 @@ Targets:
 }
 
 xi_cwd_dir() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   if [ "$(id -u)" -ne 0 ]; then
     exec sudo "$0" -s cwd -t dir "$@"
   fi
@@ -171,6 +207,10 @@ xi_cwd_dir() {
 }
 
 xi_host_disk() {
+  if [ -n "$debug" ]; then
+    set -x
+  fi
+
   if [ "$(id -u)" -ne 0 ]; then
     exec sudo "$0" "$@"
   fi
