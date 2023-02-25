@@ -2,8 +2,10 @@
 
 set -e
 
+argn=
 cwd="$(cd "$(dirname "$0")" && pwd)"
 
+debug=
 src=host
 suite=bullseye
 target=disk
