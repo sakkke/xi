@@ -85,6 +85,9 @@ setup_rootfs() {
   echo xi:xi | chroot rootfs /usr/sbin/chpasswd
   chroot rootfs /usr/bin/systemctl enable systemd-networkd.service
   chroot rootfs /usr/lib/systemd/systemd-sysv-install enable sddm
+  mount -B /proc rootfs/proc
+  chroot rootfs /usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+  umount rootfs/proc
 }
 
 setup_filesystem_squashfs() {

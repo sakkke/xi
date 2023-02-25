@@ -1,7 +1,9 @@
 ark
 btrfs-progs
 dragonplayer
+ca-certificates
 firefox-esr
+flatpak
 juk
 kate
 kde-plasma-desktop
@@ -11,3 +13,4 @@ kontact
 linux-image-amd64
 live-boot
 locales
+plasma-discover-backend-flatpak
