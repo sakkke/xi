@@ -6,8 +6,11 @@ OpenGLIsUnsafe=false
 
 [Desktops]
 Id_1=c73cd643-d27e-491c-8dac-66f9ca5fe0bf
-Number=1
-Rows=1
+Id_2=04748b3c-8272-448e-9c39-20c0962373f2
+Id_3=86342ee3-da64-40e3-8f23-79079c79614d
+Id_4=5fcc91c7-5fde-4baa-b545-f825f732d2a9
+Number=4
+Rows=2
 
 [TabBox]
 DesktopLayout=org.kde.breeze.desktop
