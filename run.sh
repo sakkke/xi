@@ -12,7 +12,7 @@ qemu-system-x86_64 \
   -bios OVMF.fd \
   -cpu host \
   -drive file=user.iso,format=raw \
+  -drive file=user.qcow2 \
   -enable-kvm \
-  -hdb user.qcow2 \
   -m 2048 \
   -vga virtio
