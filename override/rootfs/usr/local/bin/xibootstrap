@@ -11,12 +11,16 @@ suite=bullseye
 target=disk
 
 main() {
-  eval set -- $(getopt -o s:t: -l debug,help,source:,suite:,target: -- "$@")
+  eval set -- $(getopt -o s:t: -l debug::,help,source:,suite:,target: -- "$@")
 
   while [ "$1" != -- ]; do
     case "$1" in
       --debug )
-        debug=1
+        if [ "$2" -eq 0 ]; then
+          debug=0
+        else
+          debug=1
+        fi
         ;;
 
       --help )
@@ -45,7 +49,7 @@ main() {
 
   shift
 
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -66,7 +70,7 @@ main() {
 }
 
 setup_dir() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -75,7 +79,7 @@ setup_dir() {
 }
 
 setup_rootfs() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -101,7 +105,7 @@ setup_rootfs() {
 }
 
 setup_filesystem_squashfs() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -110,7 +114,7 @@ setup_filesystem_squashfs() {
 }
 
 setup_efi_img() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -120,7 +124,7 @@ setup_efi_img() {
 }
 
 setup_efi() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -136,7 +140,7 @@ setup_efi() {
 }
 
 setup_live() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -146,7 +150,7 @@ setup_live() {
 }
 
 setup_iso() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -157,7 +161,7 @@ setup_iso() {
 }
 
 show_help() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
@@ -184,12 +188,12 @@ Targets:
 }
 
 xi_cwd_dir() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
   if [ "$(id -u)" -ne 0 ]; then
-    exec sudo "$0" -s cwd -t dir "$@"
+    exec sudo "$0" --debug="$debug" -s cwd -t dir "$@"
   fi
 
   if [ "$argn" -lt 1 ]; then
@@ -209,7 +213,7 @@ xi_cwd_dir() {
 }
 
 xi_host_disk() {
-  if [ -n "$debug" ]; then
+  if [ "$debug" -ne 0 ]; then
     set -x
   fi
 
