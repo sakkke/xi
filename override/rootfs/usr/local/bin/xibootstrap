@@ -91,7 +91,7 @@ setup_rootfs() {
   fi
 
   cp -R root rootfs
-  xargs -a "$cwd"/packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
+  xargs -a "$cwd"/debian.packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
   cp -RT "$cwd"/override/rootfs rootfs
