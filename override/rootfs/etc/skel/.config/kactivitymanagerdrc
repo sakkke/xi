@@ -1,5 +1,13 @@
 [activities]
-6d95263e-bf00-4bfe-ba6d-058f1c65d32b=Default
+6d95263e-bf00-4bfe-ba6d-058f1c65d32b=Activity 1
+972b427c-8781-4d4c-b1fc-6911a6963108=Activity 2
+ddcd8ec3-aeee-4a18-8976-a5c4191ef67e=Activity 3
+ff1b16fa-8f93-411f-a7cb-d1a65b58b9b6=Activity 4
+
+[activities-icons]
+972b427c-8781-4d4c-b1fc-6911a6963108=activities
+ddcd8ec3-aeee-4a18-8976-a5c4191ef67e=activities
+ff1b16fa-8f93-411f-a7cb-d1a65b58b9b6=activities
 
 [main]
 currentActivity=6d95263e-bf00-4bfe-ba6d-058f1c65d32b
