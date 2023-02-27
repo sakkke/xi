@@ -167,8 +167,8 @@ show_help() {
 
   cat << '/cat'
 Usage:
-  xibootstrap [-t disk] DISK ADMIN
-  xibootstrap -t dir DIRECTORY
+  xibootstrap [OPTION]... [-t disk] DISK ADMIN
+  xibootstrap [OPTION]... -t dir DIRECTORY
 
 Options:
   --debug  enable debug mode
