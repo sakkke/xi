@@ -61,7 +61,7 @@ immutability=1
 plugin=org.kde.plasma.icontasks
 
 [Containments][17][Applets][20][Configuration][General]
-launchers=preferred://browser
+launchers=file:///var/lib/flatpak/exports/share/applications/org.signal.Signal.desktop,preferred://browser
 
 [Containments][17][Applets][21]
 immutability=1
