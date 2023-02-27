@@ -94,6 +94,8 @@ setup_rootfs() {
   fi
 
   cp -R root rootfs
+  mount -B /proc rootfs/proc
+  defer_cmd="$defer_cmd; umount rootfs/proc"
   xargs -a "$cwd"/debian.packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
@@ -102,8 +104,6 @@ setup_rootfs() {
   echo xi:xi | chroot rootfs /usr/sbin/chpasswd
   chroot rootfs /usr/bin/systemctl enable systemd-networkd.service
   chroot rootfs /usr/lib/systemd/systemd-sysv-install enable sddm
-  mount -B /proc rootfs/proc
-  defer_cmd="$defer_cmd; umount rootfs/proc"
   chroot rootfs /usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   xargs -a "$cwd"/flatpak.packages chroot rootfs /usr/bin/flatpak install --noninteractive -y
   eval "$defer_cmd"
