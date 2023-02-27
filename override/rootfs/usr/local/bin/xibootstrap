@@ -4,6 +4,7 @@ set -e
 
 argn=
 cwd="$(cd "$(dirname "$0")" && pwd)"
+defer_cmd=:
 
 debug=
 src=host
@@ -11,6 +12,8 @@ suite=bullseye
 target=disk
 
 main() {
+  trap 'eval "$defer_cmd"' EXIT
+
   eval set -- $(getopt -o s:t: -l debug::,help,source:,suite:,target: -- "$@")
 
   while [ "$1" != -- ]; do
@@ -100,9 +103,11 @@ setup_rootfs() {
   chroot rootfs /usr/bin/systemctl enable systemd-networkd.service
   chroot rootfs /usr/lib/systemd/systemd-sysv-install enable sddm
   mount -B /proc rootfs/proc
+  defer_cmd="$defer_cmd; umount rootfs/proc"
   chroot rootfs /usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   xargs -a "$cwd"/flatpak.packages chroot rootfs /usr/bin/flatpak install --noninteractive -y
-  umount rootfs/proc
+  eval "$defer_cmd"
+  defer_cmd=:
 }
 
 setup_filesystem_squashfs() {
