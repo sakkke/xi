@@ -101,7 +101,7 @@ setup_rootfs() {
   chroot rootfs /usr/lib/systemd/systemd-sysv-install enable sddm
   mount -B /proc rootfs/proc
   chroot rootfs /usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-  xargs -a "$cwd"/flatpak.packages chroot rootfs /usr/bin/flatpak install -y
+  xargs -a "$cwd"/flatpak.packages chroot rootfs /usr/bin/flatpak install --noninteractive -y
   umount rootfs/proc
 }
 
