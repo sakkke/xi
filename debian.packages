@@ -1,11 +1,14 @@
 ark
 at
 btrfs-progs
+build-essential
 dragonplayer
 ca-certificates
 curl
+file
 flatpak
 fonts-roboto
+git
 juk
 k3b
 kate
@@ -17,4 +20,5 @@ live-boot
 locales
 plasma-discover-backend-flatpak
 plasma-widgets-addons
+procps
 virt-manager

@@ -112,6 +112,8 @@ setup_rootfs() {
   chroot rootfs /usr/lib/systemd/systemd-sysv-install enable sddm
   chroot rootfs /usr/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
   xargs -a "$cwd"/flatpak.packages chroot rootfs /usr/bin/flatpak install --noninteractive -y
+  chroot rootfs /usr/sbin/runuser -u xi -- /usr/bin/env NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  xargs -a "$cwd"/homebrew.packages chroot rootfs /usr/sbin/runuser -u xi -- /home/linuxbrew/.linuxbrew/bin/brew install
   eval "$defer_cmd"
   defer_cmd=:
 }
