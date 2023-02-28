@@ -3,6 +3,7 @@ at
 btrfs-progs
 dragonplayer
 ca-certificates
+curl
 flatpak
 fonts-roboto
 juk
