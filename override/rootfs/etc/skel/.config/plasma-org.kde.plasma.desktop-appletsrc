@@ -98,12 +98,16 @@ plugin=org.kde.plasma.windowlist
 immutability=1
 plugin=org.kde.plasma.activitypager
 
+[Containments][17][Applets][38]
+immutability=1
+plugin=org.kde.milou
+
 [Containments][17][ConfigDialog]
 DialogHeight=84
 DialogWidth=3840
 
 [Containments][17][General]
-AppletOrder=33;34;19;32;18;20;31;21;28;29
+AppletOrder=33;34;19;32;18;38;20;31;21;28;29
 
 [Containments][22]
 activityId=
