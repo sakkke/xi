@@ -106,7 +106,7 @@ ForegroundPositive=39,174,96
 ForegroundVisited=127,140,141
 
 [General]
-BrowserApplication=firefox-esr.desktop
+BrowserApplication=org.mozilla.firefox.desktop
 ColorScheme=BreezeDark
 Name=Breeze Dark
 shadeSortColumn=true
