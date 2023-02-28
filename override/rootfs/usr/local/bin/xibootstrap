@@ -117,6 +117,17 @@ setup_rootfs() {
   chroot rootfs /usr/sbin/runuser -u xi -- /usr/bin/env NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   xargs -a "$cwd"/homebrew.packages chroot rootfs /usr/sbin/runuser -u xi -- /home/linuxbrew/.linuxbrew/bin/brew install
   chroot rootfs /usr/sbin/runuser -u xi -- /bin/bash -c 'sh <(curl -L https://nixos.org/nix/install) --daemon --yes'
+  cp "$cwd"/nix.packages rootfs/nix.packages
+  chroot rootfs /usr/sbin/runuser -u xi -- /bin/sh << '/chroot'
+sudo /nix/var/nix/profiles/default/bin/nix-daemon &
+nix_daemon="$?"
+sleep 10
+/nix/var/nix/profiles/default/bin/nix-channel --add https://nixos.org/channels/nixpkgs-unstable nixpkgs
+/nix/var/nix/profiles/default/bin/nix-channel --update nixpkgs
+xargs -a /nix.packages /nix/var/nix/profiles/default/bin/nix-env -iA
+sudo pkill -P "$nix_daemon"
+/chroot
+  rm rootfs/nix.packages
   eval "$defer_cmd"
   defer_cmd=:
 }
