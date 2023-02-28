@@ -109,6 +109,7 @@ ForegroundVisited=127,140,141
 BrowserApplication=org.mozilla.firefox.desktop
 ColorScheme=BreezeDark
 Name=Breeze Dark
+TerminalApplication=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=wezterm org.wezfurlong.wezterm --start --cwd .
 shadeSortColumn=true
 widgetStyle=Breeze
 
