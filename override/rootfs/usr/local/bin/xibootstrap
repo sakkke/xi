@@ -108,7 +108,7 @@ setup_rootfs() {
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
   cp -RT "$cwd"/override/rootfs rootfs
-  chroot rootfs /usr/sbin/useradd -mG sudo -s /bin/bash xi
+  chroot rootfs /usr/sbin/useradd -mG sudo -s /usr/bin/zsh xi
   echo xi:xi | chroot rootfs /usr/sbin/chpasswd
   chroot rootfs /usr/bin/systemctl enable systemd-networkd.service
   chroot rootfs /usr/lib/systemd/systemd-sysv-install enable sddm
