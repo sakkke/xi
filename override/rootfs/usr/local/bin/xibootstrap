@@ -100,6 +100,8 @@ setup_rootfs() {
   defer_cmd="$defer_cmd; umount rootfs/proc"
   mount -B /sys rootfs/sys
   defer_cmd="$defer_cmd; umount rootfs/sys"
+  mount -t tmpfs none rootfs/tmp
+  defer_cmd="$defer_cmd; umount rootfs/tmp"
   xargs -a "$cwd"/debian.packages chroot rootfs /usr/bin/env DEBIAN_FRONTEND=noninteractive /usr/bin/apt-get -qqy install
   chroot rootfs /usr/bin/apt-get clean
   rm -rf rootfs/var/lib/apt/lists/*
