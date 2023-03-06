@@ -19,7 +19,7 @@ main() {
   while [ "$1" != -- ]; do
     case "$1" in
       --debug )
-        if [ "$2" -eq 0 ]; then
+        if [ "$2" = 0 ]; then
           debug=0
         else
           debug=1
