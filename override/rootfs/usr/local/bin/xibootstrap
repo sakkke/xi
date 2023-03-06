@@ -96,6 +96,8 @@ setup_rootfs() {
   cp -R root rootfs
   mount -B /dev rootfs/dev
   defer_cmd="$defer_cmd; umount rootfs/dev"
+  mount -B /dev/pts rootfs/dev/pts
+  defer_cmd="umount rootfs/dev/pts; $defer_cmd"
   mount -B /proc rootfs/proc
   defer_cmd="$defer_cmd; umount rootfs/proc"
   mount -B /sys rootfs/sys
